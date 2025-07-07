@@ -1166,7 +1166,21 @@ export function PartnersPage() {
                     </div>
                   </div>
                 ))}
-                <button className="w-full p-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-gray-400 hover:text-gray-600 transition-colors flex items-center justify-center space-x-2">
+                <button 
+                  onClick={() => {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = '.pdf,.doc,.docx,.txt,.jpg,.png';
+                    input.onchange = (e) => {
+                      const file = (e.target as HTMLInputElement).files?.[0];
+                      if (file) {
+                        alert(`File "${file.name}" selected for upload. Upload functionality would be implemented here.`);
+                      }
+                    };
+                    input.click();
+                  }}
+                  className="w-full p-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-gray-400 hover:text-gray-600 transition-colors flex items-center justify-center space-x-2"
+                >
                   <Upload className="w-4 h-4" />
                   <span>Upload Document</span>
                 </button>
@@ -1191,17 +1205,53 @@ export function PartnersPage() {
                 <Phone className="w-4 h-4" />
                 <span>Call</span>
               </button>
-              <button className="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-full font-medium transition-colors flex items-center space-x-2">
+              <button 
+                onClick={() => {
+                  const subject = `Meeting with ${selectedPartner.name}`;
+                  const body = `Hi ${selectedPartner.primaryContact.name},\n\nI'd like to schedule a meeting to discuss our partnership.\n\nBest regards`;
+                  const mailtoLink = `mailto:${selectedPartner.primaryContact.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                  window.open(mailtoLink);
+                }}
+                className="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-full font-medium transition-colors flex items-center space-x-2"
+              >
                 <Calendar className="w-4 h-4" />
                 <span>Schedule Meeting</span>
               </button>
             </div>
             <div className="flex items-center space-x-3">
-              <button className="border border-gray-200 hover:bg-gray-50 text-gray-700 px-6 py-3 rounded-full font-medium transition-colors flex items-center space-x-2">
+              <button 
+                onClick={() => {
+                  const clonedPartner = {
+                    ...selectedPartner,
+                    id: crypto.randomUUID(),
+                    name: `${selectedPartner.name} (Copy)`,
+                    joinDate: new Date(),
+                    contractStart: new Date(),
+                    contractEnd: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
+                    lastContact: new Date(),
+                    lastActivity: new Date(),
+                    createdBy: 'current-user',
+                    lastModified: new Date()
+                  };
+                  
+                  // In a real app, you'd save this to your backend
+                  alert(`Partner "${clonedPartner.name}" has been cloned successfully!`);
+                }}
+                className="border border-gray-200 hover:bg-gray-50 text-gray-700 px-6 py-3 rounded-full font-medium transition-colors flex items-center space-x-2"
+              >
                 <Copy className="w-4 h-4" />
                 <span>Clone Partner</span>
               </button>
-              <button className="border border-red-200 hover:bg-red-50 text-red-700 px-6 py-3 rounded-full font-medium transition-colors flex items-center space-x-2">
+              <button 
+                onClick={() => {
+                  if (confirm(`Are you sure you want to archive ${selectedPartner.name}? This action can be undone later.`)) {
+                    // In a real app, you'd update the partner status to 'archived'
+                    alert(`${selectedPartner.name} has been archived successfully!`);
+                    setCurrentView('dashboard');
+                  }
+                }}
+                className="border border-red-200 hover:bg-red-50 text-red-700 px-6 py-3 rounded-full font-medium transition-colors flex items-center space-x-2"
+              >
                 <Trash2 className="w-4 h-4" />
                 <span>Archive</span>
               </button>

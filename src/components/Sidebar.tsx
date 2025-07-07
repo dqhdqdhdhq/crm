@@ -49,26 +49,26 @@ export function Sidebar({
   };
 
   return (
-    <div className={`${isCollapsed ? 'w-20' : 'w-72'} h-screen bg-white/90 backdrop-blur-2xl border-r border-gray-200/30 flex flex-col shadow-xl transition-all duration-300`}>
+    <div className={`${isCollapsed ? 'w-16' : 'w-64'} h-screen bg-white/90 backdrop-blur-2xl border-r border-gray-200/30 flex flex-col shadow-xl transition-all duration-300`}>
       {/* User Profile */}
-      <div className="p-8 border-b border-gray-200/30">
+      <div className={`${isCollapsed ? 'p-4' : 'p-6'} border-b border-gray-200/30`}>
         <div className="flex items-center justify-between">
           {!isCollapsed && (
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-2xl ring-2 ring-blue-100">
-                <User className="w-6 h-6 text-white" />
+                          <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg ring-2 ring-blue-100">
+                  <User className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-gray-900">Workspace</h3>
+                  <p className="text-xs text-gray-600 font-medium">Personal</p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-lg font-bold text-gray-900">Your Workspace</h3>
-                <p className="text-sm text-gray-600 font-medium">Personal</p>
+          )}
+                      {isCollapsed && (
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg ring-2 ring-blue-100 mx-auto">
+                <User className="w-5 h-5 text-white" />
               </div>
-            </div>
-          )}
-          {isCollapsed && (
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-2xl ring-2 ring-blue-100 mx-auto">
-              <User className="w-6 h-6 text-white" />
-            </div>
-          )}
+            )}
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
             className="p-2 rounded-xl bg-black/5 hover:bg-black/10 transition-colors"
@@ -79,14 +79,14 @@ export function Sidebar({
       </div>
 
       {/* Navigation */}
-      <div className="flex-1 p-6 overflow-y-auto">
-        <nav className="space-y-2 mb-10">
+      <div className={`flex-1 ${isCollapsed ? 'p-3' : 'p-4'} overflow-y-auto`}>
+        <nav className="space-y-1 mb-6">
           {navigationItems.map((item) => (
             <button
               key={item.id}
               onClick={() => onSectionSelect(item.id)}
               className={`
-                w-full flex items-center ${isCollapsed ? 'justify-center' : 'space-x-4'} p-4 rounded-2xl transition-all duration-300 text-left font-semibold group hover:scale-[1.02]
+                w-full flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'} ${isCollapsed ? 'p-3' : 'p-3'} rounded-xl transition-all duration-300 text-left font-semibold group hover:scale-[1.02]
                 ${activeSection === item.id
                   ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-xl shadow-blue-200/50 scale-[1.02]' 
                   : 'text-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-blue-50/50 hover:text-gray-900 hover:shadow-lg'
@@ -100,54 +100,54 @@ export function Sidebar({
           ))}
         </nav>
 
-        {/* Quick Actions */}
-        {!isCollapsed && (
-          <div className="mb-10">
-            <div className="flex items-center justify-between mb-4">
-              <h4 className="text-sm font-bold text-gray-800 uppercase tracking-wider">
+        {/* Quick Actions - Only show for pages section */}
+        {!isCollapsed && activeSection === 'pages' && (
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider">
                 Quick Actions
               </h4>
             </div>
             
             <button
               onClick={() => onCreatePage()}
-              className="w-full flex items-center space-x-4 p-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-2xl hover:from-green-700 hover:to-emerald-700 hover:shadow-xl hover:shadow-green-200/50 hover:-translate-y-1 hover:scale-105 transition-all duration-300 font-semibold group"
+              className="w-full flex items-center space-x-3 p-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:from-green-700 hover:to-emerald-700 hover:shadow-lg hover:shadow-green-200/50 hover:scale-105 transition-all duration-300 font-semibold group"
             >
-              <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
-              <span>New Page</span>
+              <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform duration-300" />
+              <span className="text-sm">New Page</span>
             </button>
           </div>
         )}
 
-        {/* Recent Pages */}
-        {!isCollapsed && pages.length > 0 && (
+        {/* Recent Pages - Only show for pages section */}
+        {!isCollapsed && activeSection === 'pages' && pages.length > 0 && (
           <div>
-            <div className="flex items-center justify-between mb-4">
-              <h4 className="text-sm font-bold text-gray-800 uppercase tracking-wider">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider">
                 Recent Pages
               </h4>
               <button
                 onClick={() => setShowRecentPages(!showRecentPages)}
                 className="text-gray-500 hover:text-gray-700 transition-colors p-1 rounded-lg hover:bg-gray-100"
               >
-                <Clock className="w-4 h-4" />
+                <Clock className="w-3 h-3" />
               </button>
             </div>
             
             {showRecentPages && (
-              <div className="space-y-2">
+              <div className="space-y-1">
                 {getRecentPages().map((page) => (
                   <button
                     key={page.id}
                     onClick={() => onSelectPage(page.id)}
-                    className="w-full flex items-center space-x-4 p-3 text-left text-sm text-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-blue-50/50 hover:text-gray-900 rounded-xl transition-all duration-300 group hover:shadow-md hover:scale-[1.02]"
+                    className="w-full flex items-center space-x-3 p-2 text-left text-sm text-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-blue-50/50 hover:text-gray-900 rounded-lg transition-all duration-300 group hover:shadow-sm"
                   >
-                    <span className="text-lg group-hover:scale-125 transition-transform duration-300">
+                    <span className="text-base group-hover:scale-110 transition-transform duration-300">
                       {page.emoji || '📄'}
                     </span>
                     <div className="flex-1 min-w-0">
-                      <div className="truncate font-semibold">{page.title}</div>
-                      <div className="text-xs text-gray-500 font-medium">
+                      <div className="truncate font-medium text-sm">{page.title}</div>
+                      <div className="text-xs text-gray-500">
                         {new Date(page.updatedAt).toLocaleDateString()}
                       </div>
                     </div>
@@ -168,8 +168,8 @@ export function Sidebar({
           </div>
         )}
 
-        {/* Empty State */}
-        {!isCollapsed && pages.length === 0 && (
+        {/* Empty State - Only show for pages section */}
+        {!isCollapsed && activeSection === 'pages' && pages.length === 0 && (
           <div className="text-center py-10">
             <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
               <FileText className="w-8 h-8 text-gray-400" />
