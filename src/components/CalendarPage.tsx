@@ -1,17 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   ChevronLeft, 
   ChevronRight, 
   Plus, 
-  Calendar as CalendarIcon,
   Clock,
   MapPin,
   Users,
-  MoreHorizontal,
   Search,
-  Filter,
   Bell,
-  Video,
   Phone,
   Coffee,
   Briefcase,
@@ -114,7 +110,6 @@ export function CalendarPage() {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
     const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
     const startDate = new Date(firstDay);
     startDate.setDate(startDate.getDate() - firstDay.getDay());
     
@@ -194,10 +189,6 @@ export function CalendarPage() {
 
   const monthDays = getMonthDays();
   const upcomingEvents = getUpcomingEvents();
-
-  const handleEventClick = (event: CalendarEvent) => {
-    setSelectedEventForModal(event);
-  };
 
   const handleCloseEventDetailModal = () => {
     setSelectedEventForModal(null);
@@ -378,7 +369,6 @@ export function CalendarPage() {
                   <p className="text-sm text-gray-500 text-center py-4">No events today</p>
                 ) : (
                   getEventsForDate(today).map((event) => {
-                    const typeInfo = getEventTypeInfo(event.type);
                     return (
                       <div
                         key={event.id}
@@ -425,7 +415,6 @@ export function CalendarPage() {
                   <p className="text-sm text-gray-500 text-center py-4">No upcoming events</p>
                 ) : (
                   upcomingEvents.map((event) => {
-                    const typeInfo = getEventTypeInfo(event.type);
                     return (
                       <div
                         key={event.id}

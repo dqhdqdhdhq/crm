@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import { 
   FileText,
   Plus,
@@ -8,7 +8,10 @@ import {
   Users,
   Clock,
   Folder,
-  CheckSquare
+  CheckSquare,
+  Handshake,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { Page } from '../types';
 
@@ -25,6 +28,7 @@ const navigationItems = [
   { id: 'pages', icon: FileText, label: 'Pages' },
   { id: 'calendar', icon: Calendar, label: 'Calendar' },
   { id: 'prospects', icon: Users, label: 'Prospects' },
+  { id: 'partners', icon: Handshake, label: 'Partners' },
   { id: 'settings', icon: Settings, label: 'Settings' },
 ];
 
@@ -35,7 +39,8 @@ export function Sidebar({
   onCreatePage,
   pages
 }: SidebarProps) {
-  const [showRecentPages, setShowRecentPages] = React.useState(true);
+  const [showRecentPages, setShowRecentPages] = useState(true);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const getRecentPages = () => {
     return pages
@@ -44,87 +49,105 @@ export function Sidebar({
   };
 
   return (
-    <div className="w-64 h-screen bg-white/80 backdrop-blur-xl border-r border-gray-200/50 flex flex-col">
+    <div className={`${isCollapsed ? 'w-20' : 'w-72'} h-screen bg-white/90 backdrop-blur-2xl border-r border-gray-200/30 flex flex-col shadow-xl transition-all duration-300`}>
       {/* User Profile */}
-      <div className="p-6 border-b border-gray-200/50">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-            <User className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <h3 className="font-semibold text-gray-900">Your Workspace</h3>
-            <p className="text-xs text-gray-500">Personal</p>
-          </div>
+      <div className="p-8 border-b border-gray-200/30">
+        <div className="flex items-center justify-between">
+          {!isCollapsed && (
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-2xl ring-2 ring-blue-100">
+                <User className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-gray-900">Your Workspace</h3>
+                <p className="text-sm text-gray-600 font-medium">Personal</p>
+              </div>
+            </div>
+          )}
+          {isCollapsed && (
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-2xl ring-2 ring-blue-100 mx-auto">
+              <User className="w-6 h-6 text-white" />
+            </div>
+          )}
+          <button
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="p-2 rounded-xl bg-black/5 hover:bg-black/10 transition-colors"
+          >
+            {isCollapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
+          </button>
         </div>
       </div>
 
       {/* Navigation */}
-      <div className="flex-1 p-4 overflow-y-auto">
-        <nav className="space-y-1 mb-8">
+      <div className="flex-1 p-6 overflow-y-auto">
+        <nav className="space-y-2 mb-10">
           {navigationItems.map((item) => (
             <button
               key={item.id}
               onClick={() => onSectionSelect(item.id)}
               className={`
-                w-full flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 text-left text-sm font-medium
+                w-full flex items-center ${isCollapsed ? 'justify-center' : 'space-x-4'} p-4 rounded-2xl transition-all duration-300 text-left font-semibold group hover:scale-[1.02]
                 ${activeSection === item.id
-                  ? 'bg-blue-50 text-blue-700 border border-blue-200 shadow-sm' 
-                  : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-xl shadow-blue-200/50 scale-[1.02]' 
+                  : 'text-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-blue-50/50 hover:text-gray-900 hover:shadow-lg'
                 }
               `}
+              title={isCollapsed ? item.label : undefined}
             >
-              <item.icon className="w-4 h-4" />
-              <span>{item.label}</span>
+              <item.icon className={`w-5 h-5 transition-all duration-300 ${activeSection === item.id ? 'text-white' : 'text-gray-500 group-hover:text-blue-600'}`} />
+              {!isCollapsed && <span className="text-sm">{item.label}</span>}
             </button>
           ))}
         </nav>
 
         {/* Quick Actions */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-3">
-            <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-              Quick Actions
-            </h4>
+        {!isCollapsed && (
+          <div className="mb-10">
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="text-sm font-bold text-gray-800 uppercase tracking-wider">
+                Quick Actions
+              </h4>
+            </div>
+            
+            <button
+              onClick={() => onCreatePage()}
+              className="w-full flex items-center space-x-4 p-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-2xl hover:from-green-700 hover:to-emerald-700 hover:shadow-xl hover:shadow-green-200/50 hover:-translate-y-1 hover:scale-105 transition-all duration-300 font-semibold group"
+            >
+              <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
+              <span>New Page</span>
+            </button>
           </div>
-          
-          <button
-            onClick={() => onCreatePage()}
-            className="w-full flex items-center space-x-3 p-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 text-sm font-medium"
-          >
-            <Plus className="w-4 h-4" />
-            <span>New Page</span>
-          </button>
-        </div>
+        )}
 
         {/* Recent Pages */}
-        {pages.length > 0 && (
+        {!isCollapsed && pages.length > 0 && (
           <div>
-            <div className="flex items-center justify-between mb-3">
-              <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="text-sm font-bold text-gray-800 uppercase tracking-wider">
                 Recent Pages
               </h4>
               <button
                 onClick={() => setShowRecentPages(!showRecentPages)}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
+                className="text-gray-500 hover:text-gray-700 transition-colors p-1 rounded-lg hover:bg-gray-100"
               >
-                <Clock className="w-3 h-3" />
+                <Clock className="w-4 h-4" />
               </button>
             </div>
             
             {showRecentPages && (
-              <div className="space-y-1">
+              <div className="space-y-2">
                 {getRecentPages().map((page) => (
                   <button
                     key={page.id}
                     onClick={() => onSelectPage(page.id)}
-                    className="w-full flex items-center space-x-3 p-2.5 text-left text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-all duration-200 group"
+                    className="w-full flex items-center space-x-4 p-3 text-left text-sm text-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-blue-50/50 hover:text-gray-900 rounded-xl transition-all duration-300 group hover:shadow-md hover:scale-[1.02]"
                   >
-                    <span className="text-sm group-hover:scale-110 transition-transform">
+                    <span className="text-lg group-hover:scale-125 transition-transform duration-300">
                       {page.emoji || '📄'}
                     </span>
                     <div className="flex-1 min-w-0">
-                      <div className="truncate font-medium">{page.title}</div>
-                      <div className="text-xs text-gray-400">
+                      <div className="truncate font-semibold">{page.title}</div>
+                      <div className="text-xs text-gray-500 font-medium">
                         {new Date(page.updatedAt).toLocaleDateString()}
                       </div>
                     </div>
@@ -134,9 +157,9 @@ export function Sidebar({
                 {pages.length > 5 && (
                   <button
                     onClick={() => onSectionSelect('pages')}
-                    className="w-full flex items-center space-x-3 p-2.5 text-left text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700 rounded-lg transition-colors"
+                    className="w-full flex items-center space-x-4 p-3 text-left text-sm text-gray-600 hover:bg-gradient-to-r hover:from-gray-50 hover:to-blue-50/50 hover:text-gray-800 rounded-xl transition-all duration-300 group hover:shadow-md font-medium"
                   >
-                    <Folder className="w-4 h-4" />
+                    <Folder className="w-4 h-4 group-hover:text-blue-600 transition-colors" />
                     <span>View all pages ({pages.length})</span>
                   </button>
                 )}
@@ -146,15 +169,15 @@ export function Sidebar({
         )}
 
         {/* Empty State */}
-        {pages.length === 0 && (
-          <div className="text-center py-8">
-            <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-              <FileText className="w-6 h-6 text-gray-400" />
+        {!isCollapsed && pages.length === 0 && (
+          <div className="text-center py-10">
+            <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+              <FileText className="w-8 h-8 text-gray-400" />
             </div>
-            <p className="text-sm text-gray-500 mb-4">No pages yet</p>
+            <p className="text-base text-gray-600 mb-6 font-medium">No pages yet</p>
             <button
               onClick={() => onCreatePage()}
-              className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+              className="text-sm text-blue-600 hover:text-blue-700 font-bold px-4 py-2 rounded-xl hover:bg-blue-50 transition-all duration-200"
             >
               Create your first page
             </button>

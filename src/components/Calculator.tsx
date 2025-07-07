@@ -162,10 +162,10 @@ export function Calculator({ isVisible, onClose }: CalculatorProps) {
     }
   };
 
-  const percentage = () => {
-    const value = parseFloat(display);
-    setDisplay(String(value / 100));
-  };
+  // const percentage = () => {
+  //   const value = parseFloat(display);
+  //   setDisplay(String(value / 100));
+  // };
 
   if (!isVisible) return null;
 

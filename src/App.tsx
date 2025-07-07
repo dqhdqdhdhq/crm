@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { TasksPage } from './components/TasksPage';
 import { NotionPage } from './components/NotionPage';
 import { PagesOverview } from './components/PagesOverview';
 import { ProspectsPage } from './components/ProspectsPage';
+import { PartnersPage } from './components/PartnersPage';
+// import { TestPage } from './components/TestPage';
 import { CalendarPage } from './components/CalendarPage';
 import { Calculator } from './components/Calculator';
 import { useLocalStorage } from './hooks/useLocalStorage';
-import { Category, Page, PageTemplate, PageCategory, Block } from './types';
+import { Page, PageTemplate, PageCategory } from './types';
 import { Calculator as CalculatorIcon } from 'lucide-react';
 
 const defaultPageTemplates: PageTemplate[] = [
@@ -17,14 +19,14 @@ const defaultPageTemplates: PageTemplate[] = [
     emoji: '📝',
     description: 'Template for meeting notes with agenda and action items',
     blocks: [
-      { type: 'heading', content: 'Meeting Notes', level: 1 },
-      { type: 'date', date: new Date(), label: 'Date' },
-      { type: 'heading', content: 'Attendees', level: 2 },
-      { type: 'list', items: [''], ordered: false },
-      { type: 'heading', content: 'Agenda', level: 2 },
-      { type: 'list', items: [''], ordered: true },
-      { type: 'heading', content: 'Action Items', level: 2 },
-      { type: 'table', headers: ['Task', 'Owner', 'Due Date'], rows: [['', '', '']] }
+      { type: 'heading', content: 'Meeting Notes', level: 1 } as any,
+      { type: 'date', date: new Date(), label: 'Date' } as any,
+      { type: 'heading', content: 'Attendees', level: 2 } as any,
+      { type: 'list', items: [''], ordered: false } as any,
+      { type: 'heading', content: 'Agenda', level: 2 } as any,
+      { type: 'list', items: [''], ordered: true } as any,
+      { type: 'heading', content: 'Action Items', level: 2 } as any,
+      { type: 'table', headers: ['Task', 'Owner', 'Due Date'], rows: [['', '', '']] } as any
     ]
   },
   {
@@ -33,13 +35,13 @@ const defaultPageTemplates: PageTemplate[] = [
     emoji: '🚀',
     description: 'Template for project planning and tracking',
     blocks: [
-      { type: 'heading', content: 'Project Plan', level: 1 },
-      { type: 'heading', content: 'Overview', level: 2 },
-      { type: 'text', content: 'Project description and goals...' },
-      { type: 'heading', content: 'Timeline', level: 2 },
-      { type: 'table', headers: ['Phase', 'Start Date', 'End Date', 'Status'], rows: [['', '', '', '']] },
-      { type: 'heading', content: 'Resources', level: 2 },
-      { type: 'list', items: [''], ordered: false }
+      { type: 'heading', content: 'Project Plan', level: 1 } as any,
+      { type: 'heading', content: 'Overview', level: 2 } as any,
+      { type: 'text', content: 'Project description and goals...' } as any,
+      { type: 'heading', content: 'Timeline', level: 2 } as any,
+      { type: 'table', headers: ['Phase', 'Start Date', 'End Date', 'Status'], rows: [['', '', '', '']] } as any,
+      { type: 'heading', content: 'Resources', level: 2 } as any,
+      { type: 'list', items: [''], ordered: false } as any
     ]
   },
   {
@@ -48,15 +50,15 @@ const defaultPageTemplates: PageTemplate[] = [
     emoji: '📔',
     description: 'Template for daily reflection and planning',
     blocks: [
-      { type: 'heading', content: 'Daily Journal', level: 1 },
-      { type: 'date', date: new Date(), label: 'Date', includeTime: false },
-      { type: 'heading', content: 'Today\'s Goals', level: 2 },
-      { type: 'list', items: [''], ordered: false },
-      { type: 'heading', content: 'Reflections', level: 2 },
-      { type: 'text', content: 'What went well today?' },
-      { type: 'text', content: 'What could be improved?' },
-      { type: 'heading', content: 'Tomorrow\'s Priorities', level: 2 },
-      { type: 'list', items: [''], ordered: true }
+      { type: 'heading', content: 'Daily Journal', level: 1 } as any,
+      { type: 'date', date: new Date(), label: 'Date', includeTime: false } as any,
+      { type: 'heading', content: 'Today\'s Goals', level: 2 } as any,
+      { type: 'list', items: [''], ordered: false } as any,
+      { type: 'heading', content: 'Reflections', level: 2 } as any,
+      { type: 'text', content: 'What went well today?' } as any,
+      { type: 'text', content: 'What could be improved?' } as any,
+      { type: 'heading', content: 'Tomorrow\'s Priorities', level: 2 } as any,
+      { type: 'list', items: [''], ordered: true } as any
     ]
   }
 ];
@@ -109,6 +111,45 @@ const defaultPages: Page[] = [
           'Global calculator tool'
         ],
         ordered: false,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    ],
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'cold-call-script-page',
+    title: 'Cold Call Script',
+    emoji: '📞',
+    blocks: [
+      {
+        id: 'script-block-1',
+        type: 'heading',
+        content: 'Cold Call Opening',
+        level: 2,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        id: 'script-block-2',
+        type: 'text',
+        content: 'Hi [Prospect Name], this is [Your Name] from [Your Company]. Did I catch you at a bad time?',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        id: 'script-block-3',
+        type: 'heading',
+        content: 'Value Proposition',
+        level: 2,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        id: 'script-block-4',
+        type: 'text',
+        content: 'The reason I\'m calling is that we help companies like yours to [achieve X] by [doing Y].',
         createdAt: new Date(),
         updatedAt: new Date()
       }
@@ -204,6 +245,8 @@ function App() {
       return <CalendarPage />;
     } else if (activeSection === 'prospects') {
       return <ProspectsPage />;
+    } else if (activeSection === 'partners') {
+      return <PartnersPage />;
     } else if (activeSection === 'page' && activePageId) {
       const currentPage = getCurrentPage();
       if (currentPage) {
@@ -220,17 +263,18 @@ function App() {
     return (
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-4">
             {activeSection.charAt(0).toUpperCase() + activeSection.slice(1)}
           </h2>
-          <p className="text-gray-600">This section is coming soon...</p>
+          <p className="text-lg text-gray-600 mb-8">This section is coming soon...</p>
+          <div className="w-16 h-1 bg-gradient-to-r from-blue-600 to-indigo-600 mx-auto rounded-full"></div>
         </div>
       </div>
     );
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex relative">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 flex relative">
       <Sidebar
         activeSection={activeSection}
         onSectionSelect={setActiveSection}
@@ -239,23 +283,25 @@ function App() {
         pages={pages}
       />
       
-      <div className="flex-1 relative">
-        {renderMainContent()}
+      <main className="flex-1 overflow-hidden">
+        <div className="h-full overflow-y-auto">
+          {renderMainContent()}
+        </div>
         
         {/* Global Calculator Button */}
         <button
           onClick={() => setShowCalculator(!showCalculator)}
-          className="fixed top-6 right-6 w-12 h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center z-40"
+          className="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-2xl shadow-xl hover:shadow-2xl hover:-translate-y-1 hover:scale-105 transition-all duration-300 flex items-center justify-center z-30 border border-blue-500/20"
           title="Calculator"
         >
-          <CalculatorIcon size={24} />
+          <CalculatorIcon size={28} />
         </button>
 
         <Calculator
           isVisible={showCalculator}
           onClose={() => setShowCalculator(false)}
         />
-      </div>
+      </main>
     </div>
   );
 }

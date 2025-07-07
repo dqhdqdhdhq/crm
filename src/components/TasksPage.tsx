@@ -2,13 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { 
   Plus, 
   Search, 
-  Filter, 
   Calendar,
   Clock,
   Tag,
   CheckSquare,
   Square,
-  Star,
   Trash2,
   Edit3,
   MoreHorizontal,
@@ -27,7 +25,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
-import { Task, Session, TimerHistoryEntry, TaskTemplate } from '../types';
+import { Task, Session, TaskTemplate } from '../types';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 
 const defaultTaskTemplates: TaskTemplate[] = [
@@ -74,61 +72,107 @@ const defaultTaskTemplates: TaskTemplate[] = [
 ];
 
 const defaultTasks: Task[] = [
+  // To Do
   {
     id: '1',
-    title: 'Complete project proposal',
+    title: 'Draft cold call script',
     completed: false,
     priority: 'high',
-    status: 'in-progress',
+    status: 'todo',
     createdAt: new Date(),
-    description: 'Draft the Q1 project proposal with timeline and budget',
-    dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-    timeEstimate: 120,
-    tags: ['proposal', 'planning']
+    description: 'Create a new script for cold calling potential leads.',
+    timeEstimate: 60,
+    tags: ['sales', 'scripting']
   },
   {
     id: '2',
-    title: 'Review design mockups',
-    completed: true,
+    title: 'Research 10 new prospects',
+    completed: false,
     priority: 'medium',
-    status: 'done',
-    createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000),
-    description: 'Review and provide feedback on the new UI designs',
-    timeEstimate: 45,
-    tags: ['design', 'review']
+    status: 'todo',
+    createdAt: new Date(),
+    description: 'Identify 10 new potential clients in the tech industry.',
+    timeEstimate: 120,
+    tags: ['research', 'prospecting']
   },
   {
     id: '3',
-    title: 'Setup development environment',
+    title: 'Follow up with existing leads',
+    completed: false,
+    priority: 'high',
+    status: 'todo',
+    createdAt: new Date(),
+    description: 'Send follow-up emails to all leads from last week.',
+    timeEstimate: 45,
+    tags: ['sales', 'communication']
+  },
+  {
+    id: '4',
+    title: 'Prepare for team meeting',
+    completed: false,
+    priority: 'medium',
+    status: 'todo',
+    createdAt: new Date(),
+    description: 'Gather metrics and prepare slides for the weekly sales meeting.',
+    timeEstimate: 30,
+    tags: ['meeting', 'preparation']
+  },
+  {
+    id: '5',
+    title: 'Update CRM with new contacts',
     completed: false,
     priority: 'low',
     status: 'todo',
     createdAt: new Date(),
-    description: 'Configure local development environment for new project',
+    description: 'Add all new contacts from the networking event to the CRM.',
     timeEstimate: 60,
-    tags: ['setup', 'development']
+    tags: ['crm', 'data entry']
   },
   {
-    id: '4',
-    title: 'API Integration Testing',
+    id: '6',
+    title: 'Schedule product demo with client X',
     completed: false,
     priority: 'high',
-    status: 'in-review',
+    status: 'todo',
     createdAt: new Date(),
-    description: 'Test all API endpoints and ensure proper error handling',
-    timeEstimate: 90,
-    tags: ['testing', 'api']
+    description: 'Contact Client X and schedule a product demo for next week.',
+    timeEstimate: 20,
+    tags: ['sales', 'demo']
   },
   {
-    id: '5',
-    title: 'Database Migration',
+    id: '7',
+    title: 'Review Q3 sales targets',
     completed: false,
     priority: 'medium',
-    status: 'blocked',
+    status: 'todo',
     createdAt: new Date(),
-    description: 'Migrate user data to new database schema',
+    description: 'Review the sales targets for the upcoming quarter.',
+    timeEstimate: 45,
+    tags: ['planning', 'strategy']
+  },
+  // In Progress
+  {
+    id: '8',
+    title: 'Onboarding documentation for new hires',
+    completed: false,
+    priority: 'medium',
+    status: 'in-progress',
+    createdAt: new Date(),
+    description: 'Creating a comprehensive onboarding guide for the sales team.',
     timeEstimate: 180,
-    tags: ['database', 'migration']
+    tags: ['documentation', 'team']
+  },
+  // Done
+  {
+    id: '9',
+    title: 'Finalize Q2 sales report',
+    completed: true,
+    priority: 'high',
+    status: 'done',
+    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+    description: 'Completed and submitted the sales report for the second quarter.',
+    timeEstimate: 90,
+    tags: ['reporting', 'sales']
   }
 ];
 
@@ -144,7 +188,7 @@ export function TasksPage() {
   const [tasks, setTasks] = useLocalStorage<Task[]>('tasks', defaultTasks);
   const [templates] = useLocalStorage<TaskTemplate[]>('task-templates', defaultTaskTemplates);
   const [sessions, setSessions] = useLocalStorage<Session[]>('timer-sessions', []);
-  const [timerHistory] = useLocalStorage<TimerHistoryEntry[]>('timer-history', []);
+  // const [timerHistory] = useLocalStorage<TimerHistoryEntry[]>('timer-history', []);
   
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | 'todo' | 'in-progress' | 'done'>('all');
@@ -159,7 +203,7 @@ export function TasksPage() {
 
   // Timer effect
   useEffect(() => {
-    let interval: number;
+    let interval: any;
     
     if (activeTimer && activeTimer.status === 'running') {
       interval = setInterval(() => {
@@ -412,121 +456,121 @@ export function TasksPage() {
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <div className="flex-1 bg-gradient-to-br from-blue-50/50 via-indigo-50/30 to-purple-50/50 min-h-screen">
+      <div className="flex-1 bg-gradient-to-br from-slate-50/80 via-blue-50/40 to-indigo-50/60 min-h-screen">
         <div className="max-w-7xl mx-auto p-8">
           {/* Header */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-6">
+          <div className="mb-12">
+            <div className="flex items-center justify-between mb-8">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Tasks</h1>
-                <p className="text-gray-600">Manage your tasks and track your productivity</p>
+                <h1 className="text-4xl font-black bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700 bg-clip-text text-transparent mb-3">Tasks</h1>
+                <p className="text-lg text-gray-600 font-medium">Manage your tasks and track your productivity</p>
               </div>
               
-              <div className="flex items-center space-x-3">
-                <div className="flex items-center bg-white/70 backdrop-blur-sm border border-gray-200 rounded-xl p-1">
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center bg-white/90 backdrop-blur-sm border border-gray-200/50 rounded-2xl p-1 shadow-lg">
                   <button
                     onClick={() => setViewMode('list')}
-                    className={`p-2.5 rounded-lg transition-all duration-200 ${
+                    className={`p-3 rounded-xl transition-all duration-300 ${
                       viewMode === 'list' 
-                        ? 'bg-blue-600 text-white shadow-sm' 
+                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-xl' 
                         : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                     }`}
                   >
-                    <List className="w-4 h-4" />
+                    <List className="w-5 h-5" />
                   </button>
                   <button
                     onClick={() => setViewMode('pipeline')}
-                    className={`p-2.5 rounded-lg transition-all duration-200 ${
+                    className={`p-3 rounded-xl transition-all duration-300 ${
                       viewMode === 'pipeline' 
-                        ? 'bg-blue-600 text-white shadow-sm' 
+                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-xl' 
                         : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                     }`}
                   >
-                    <Grid3X3 className="w-4 h-4" />
+                    <Grid3X3 className="w-5 h-5" />
                   </button>
                 </div>
                 
                 <button
                   onClick={() => handleCreateTask()}
-                  className="flex items-center space-x-2 px-6 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 font-medium"
+                  className="flex items-center space-x-3 px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl hover:shadow-blue-200/50 hover:-translate-y-1 hover:scale-105 transition-all duration-300 font-bold"
                 >
-                  <Plus className="w-4 h-4" />
+                  <Plus className="w-5 h-5" />
                   <span>New Task</span>
                 </button>
               </div>
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-              <div className="bg-white/70 backdrop-blur-sm border border-gray-200 rounded-2xl p-6 hover:shadow-lg transition-all duration-200">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+              <div className="bg-white/90 backdrop-blur-xl border border-gray-200/30 rounded-3xl p-8 hover:shadow-2xl hover:shadow-blue-100/50 hover:-translate-y-2 hover:scale-105 transition-all duration-300 group">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Total Tasks</p>
-                    <p className="text-3xl font-bold text-gray-900">{stats.total}</p>
+                    <p className="text-sm font-bold text-gray-600 mb-2">Total Tasks</p>
+                    <p className="text-4xl font-black text-gray-900">{stats.total}</p>
                   </div>
-                  <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                    <CheckSquare className="w-6 h-6 text-blue-600" />
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <CheckSquare className="w-8 h-8 text-blue-600" />
                   </div>
                 </div>
               </div>
               
-              <div className="bg-white/70 backdrop-blur-sm border border-gray-200 rounded-2xl p-6 hover:shadow-lg transition-all duration-200">
+              <div className="bg-white/90 backdrop-blur-xl border border-gray-200/30 rounded-3xl p-8 hover:shadow-2xl hover:shadow-green-100/50 hover:-translate-y-2 hover:scale-105 transition-all duration-300 group">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Completed</p>
-                    <p className="text-3xl font-bold text-green-600">{stats.completed}</p>
+                    <p className="text-sm font-bold text-gray-600 mb-2">Completed</p>
+                    <p className="text-4xl font-black text-green-600">{stats.completed}</p>
                   </div>
-                  <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                    <Award className="w-6 h-6 text-green-600" />
+                  <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-green-200 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <Award className="w-8 h-8 text-green-600" />
                   </div>
                 </div>
               </div>
               
-              <div className="bg-white/70 backdrop-blur-sm border border-gray-200 rounded-2xl p-6 hover:shadow-lg transition-all duration-200">
+              <div className="bg-white/90 backdrop-blur-xl border border-gray-200/30 rounded-3xl p-8 hover:shadow-2xl hover:shadow-blue-100/50 hover:-translate-y-2 hover:scale-105 transition-all duration-300 group">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">In Progress</p>
-                    <p className="text-3xl font-bold text-blue-600">{stats.inProgress}</p>
+                    <p className="text-sm font-bold text-gray-600 mb-2">In Progress</p>
+                    <p className="text-4xl font-black text-blue-600">{stats.inProgress}</p>
                   </div>
-                  <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                    <Zap className="w-6 h-6 text-blue-600" />
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <Zap className="w-8 h-8 text-blue-600" />
                   </div>
                 </div>
               </div>
               
-              <div className="bg-white/70 backdrop-blur-sm border border-gray-200 rounded-2xl p-6 hover:shadow-lg transition-all duration-200">
+              <div className="bg-white/90 backdrop-blur-xl border border-gray-200/30 rounded-3xl p-8 hover:shadow-2xl hover:shadow-red-100/50 hover:-translate-y-2 hover:scale-105 transition-all duration-300 group">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Overdue</p>
-                    <p className="text-3xl font-bold text-red-600">{stats.overdue}</p>
+                    <p className="text-sm font-bold text-gray-600 mb-2">Overdue</p>
+                    <p className="text-4xl font-black text-red-600">{stats.overdue}</p>
                   </div>
-                  <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
-                    <Target className="w-6 h-6 text-red-600" />
+                  <div className="w-16 h-16 bg-gradient-to-br from-red-100 to-red-200 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <Target className="w-8 h-8 text-red-600" />
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Filters and Search */}
-            <div className="flex items-center justify-between space-x-6">
-              <div className="flex items-center space-x-4 flex-1">
-                <div className="relative flex-1 max-w-md">
-                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <div className="flex items-center justify-between space-x-8">
+              <div className="flex items-center space-x-6 flex-1">
+                <div className="relative flex-1 max-w-lg">
+                  <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                   <input
                     type="text"
                     placeholder="Search tasks..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-11 pr-4 py-3 bg-white/70 backdrop-blur-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all duration-200 placeholder-gray-500"
+                    className="w-full pl-13 pr-6 py-4 bg-white/90 backdrop-blur-xl border border-gray-200/30 rounded-2xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all duration-300 placeholder-gray-500 text-lg font-medium shadow-lg"
                   />
                 </div>
                 
                 {viewMode === 'list' && (
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-3">
                     <select
                       value={filterStatus}
                       onChange={(e) => setFilterStatus(e.target.value as any)}
-                      className="px-4 py-3 bg-white/70 backdrop-blur-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all duration-200 font-medium"
+                      className="px-6 py-4 bg-white/90 backdrop-blur-xl border border-gray-200/30 rounded-2xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all duration-300 font-bold text-gray-700 shadow-lg"
                     >
                       <option value="all">All Status</option>
                       <option value="todo">To Do</option>
@@ -537,7 +581,7 @@ export function TasksPage() {
                     <select
                       value={filterPriority}
                       onChange={(e) => setFilterPriority(e.target.value as any)}
-                      className="px-4 py-3 bg-white/70 backdrop-blur-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all duration-200 font-medium"
+                      className="px-6 py-4 bg-white/90 backdrop-blur-xl border border-gray-200/30 rounded-2xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all duration-300 font-bold text-gray-700 shadow-lg"
                     >
                       <option value="all">All Priority</option>
                       <option value="high">High</option>
@@ -548,7 +592,7 @@ export function TasksPage() {
                     <select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value as any)}
-                      className="px-4 py-3 bg-white/70 backdrop-blur-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all duration-200 font-medium"
+                      className="px-6 py-4 bg-white/90 backdrop-blur-xl border border-gray-200/30 rounded-2xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all duration-300 font-bold text-gray-700 shadow-lg"
                     >
                       <option value="created">Date Created</option>
                       <option value="priority">Priority</option>
@@ -574,12 +618,12 @@ export function TasksPage() {
                             <div
                               ref={provided.innerRef}
                               {...provided.droppableProps}
-                              className="bg-white/70 backdrop-blur-xl border border-gray-200/50 rounded-2xl shadow-xl overflow-hidden w-80 flex-shrink-0"
+                              className="bg-white/95 backdrop-blur-2xl border border-gray-200/30 rounded-3xl shadow-2xl overflow-hidden w-80 flex-shrink-0 hover:shadow-3xl hover:-translate-y-1 transition-all duration-300"
                             >
-                              <div className="p-4 border-b border-gray-200/50">
+                              <div className="p-6 border-b border-gray-200/30">
                                 <div className="flex items-center justify-between">
-                                  <h3 className="font-semibold text-gray-900">{column.title}</h3>
-                                  <span className={`px-2 py-1 text-xs font-medium rounded-lg ${column.color}`}>
+                                  <h3 className="text-lg font-bold text-gray-900">{column.title}</h3>
+                                  <span className={`px-3 py-2 text-sm font-bold rounded-xl ${column.color} shadow-sm`}>
                                     {tasksByStatus[column.id]?.length || 0}
                                   </span>
                                 </div>
