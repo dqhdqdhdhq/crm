@@ -11,7 +11,9 @@ import {
   CheckSquare,
   Handshake,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  DollarSign,
+  CreditCard
 } from 'lucide-react';
 import { Page } from '../types';
 
@@ -29,6 +31,8 @@ const navigationItems = [
   { id: 'calendar', icon: Calendar, label: 'Calendar' },
   { id: 'prospects', icon: Users, label: 'Prospects' },
   { id: 'partners', icon: Handshake, label: 'Partners' },
+  { id: 'subscriptions', icon: CreditCard, label: 'Subscriptions' },
+  { id: 'focus', icon: Clock, label: 'Focus Timer' },
   { id: 'settings', icon: Settings, label: 'Settings' },
 ];
 

@@ -1,16 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { TasksPage } from './components/TasksPage';
 import { NotionPage } from './components/NotionPage';
 import { PagesOverview } from './components/PagesOverview';
 import { ProspectsPage } from './components/ProspectsPage';
 import { PartnersPage } from './components/PartnersPage';
+import { SubscriptionModal } from './components/SubscriptionModal';
+import { FocusTimer } from './components/FocusTimer';
+import { GlobalFocusTimer } from './components/GlobalFocusTimer';
+
 // import { TestPage } from './components/TestPage';
-import { CalendarPage } from './components/CalendarPage';
+import { EnhancedCalendarPage } from './components/EnhancedCalendarPage';
 import { Calculator } from './components/Calculator';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { Page, PageTemplate, PageCategory } from './types';
-import { Calculator as CalculatorIcon } from 'lucide-react';
+import { Calculator as CalculatorIcon, Timer, CreditCard } from 'lucide-react';
 
 const defaultPageTemplates: PageTemplate[] = [
   {
@@ -166,10 +170,34 @@ function App() {
   const [activeSection, setActiveSection] = useState<string>('tasks');
   const [activePageId, setActivePageId] = useState<string | null>(null);
   const [showCalculator, setShowCalculator] = useState(false);
+  const [showFocusTimer, setShowFocusTimer] = useState(false);
+  const [showSubscriptions, setShowSubscriptions] = useState(false);
+
+  // Global keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl+Shift+F for Focus Timer
+      if (e.code === 'KeyF' && e.ctrlKey && e.shiftKey) {
+        e.preventDefault();
+        setShowFocusTimer(!showFocusTimer);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showFocusTimer]);
 
   const handleSelectPage = (pageId: string) => {
     setActivePageId(pageId);
     setActiveSection('page');
+  };
+
+  const handleSectionSelect = (section: string) => {
+    if (section === 'subscriptions') {
+      setShowSubscriptions(true);
+    } else {
+      setActiveSection(section);
+    }
   };
 
   const handleUpdatePage = (updatedPage: Page) => {
@@ -242,11 +270,13 @@ function App() {
         />
       );
     } else if (activeSection === 'calendar') {
-      return <CalendarPage />;
+      return <EnhancedCalendarPage />;
     } else if (activeSection === 'prospects') {
       return <ProspectsPage />;
     } else if (activeSection === 'partners') {
-      return <PartnersPage />;
+      return <PartnersPage onNavigate={setActiveSection} />;
+    } else if (activeSection === 'focus') {
+      return <FocusTimer />;
     } else if (activeSection === 'page' && activePageId) {
       const currentPage = getCurrentPage();
       if (currentPage) {
@@ -277,7 +307,7 @@ function App() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 flex relative">
       <Sidebar
         activeSection={activeSection}
-        onSectionSelect={setActiveSection}
+        onSectionSelect={handleSectionSelect}
         onSelectPage={handleSelectPage}
         onCreatePage={handleCreatePage}
         pages={pages}
@@ -288,18 +318,49 @@ function App() {
           {renderMainContent()}
         </div>
         
-        {/* Global Calculator Button */}
-        <button
-          onClick={() => setShowCalculator(!showCalculator)}
-          className="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-2xl shadow-xl hover:shadow-2xl hover:-translate-y-1 hover:scale-105 transition-all duration-300 flex items-center justify-center z-30 border border-blue-500/20"
-          title="Calculator"
-        >
-          <CalculatorIcon size={28} />
-        </button>
+        {/* Global Action Buttons */}
+        <div className="fixed bottom-6 left-6 flex flex-col space-y-3 z-30">
+          {/* Focus Timer Button */}
+          <button
+            onClick={() => setShowFocusTimer(!showFocusTimer)}
+            className="w-14 h-14 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-2xl shadow-xl hover:shadow-2xl hover:-translate-y-1 hover:scale-105 transition-all duration-300 flex items-center justify-center border border-purple-500/20"
+            title="Focus Timer (Ctrl+Shift+F)"
+          >
+            <Timer size={28} />
+          </button>
+          
+          {/* Calculator Button */}
+          <button
+            onClick={() => setShowCalculator(!showCalculator)}
+            className="w-14 h-14 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-2xl shadow-xl hover:shadow-2xl hover:-translate-y-1 hover:scale-105 transition-all duration-300 flex items-center justify-center border border-blue-500/20"
+            title="Calculator"
+          >
+            <CalculatorIcon size={28} />
+          </button>
+          
+          {/* Subscriptions Button */}
+          <button
+            onClick={() => setShowSubscriptions(!showSubscriptions)}
+            className="w-14 h-14 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-2xl shadow-xl hover:shadow-2xl hover:-translate-y-1 hover:scale-105 transition-all duration-300 flex items-center justify-center border border-green-500/20"
+            title="Subscriptions"
+          >
+            <CreditCard size={28} />
+          </button>
+        </div>
 
+        <GlobalFocusTimer
+          isVisible={showFocusTimer}
+          onClose={() => setShowFocusTimer(false)}
+        />
+        
         <Calculator
           isVisible={showCalculator}
           onClose={() => setShowCalculator(false)}
+        />
+        
+        <SubscriptionModal
+          isVisible={showSubscriptions}
+          onClose={() => setShowSubscriptions(false)}
         />
       </main>
     </div>

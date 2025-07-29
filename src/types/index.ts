@@ -11,6 +11,9 @@ export interface Task {
   tags?: string[];
   categoryId?: string;
   status: 'todo' | 'in-progress' | 'in-review' | 'blocked' | 'done';
+  // Partner linking
+  partnerId?: string;
+  partnerName?: string;
 }
 
 export interface Note {
@@ -189,9 +192,11 @@ export interface Prospect {
   id: string;
   industryId: string;
   shopBusinessName: string;
-  ownerName: string;
+  industry: string; // Changed from ownerName to industry
   location: string;
   googleMapsUrl: string;
+  latitude?: number;
+  longitude?: number;
   reviews: number;
   email: string;
   answered: 'yes' | 'no' | 'interested';
@@ -694,6 +699,40 @@ export interface FindReplaceMatch {
   position: { start: number; end: number };
 }
 
+// Calendar Template System
+export interface CalendarTemplate {
+  id: string;
+  name: string;
+  description?: string;
+  timeBlocks: TimeBlock[];
+  createdAt: Date;
+  updatedAt: Date;
+  isDefault?: boolean;
+  tags?: string[];
+  color?: string;
+}
+
+export interface TimeBlock {
+  id: string;
+  startTime: string; // HH:MM format
+  endTime: string; // HH:MM format
+  title: string;
+  description?: string;
+  type: 'work' | 'break' | 'meeting' | 'focus' | 'personal' | 'exercise' | 'meal' | 'commute' | 'other';
+  color?: string;
+  priority?: 'low' | 'medium' | 'high';
+  isRecurring?: boolean;
+  tags?: string[];
+}
+
+export interface TemplateApplication {
+  templateId: string;
+  date: Date;
+  appliedEvents: string[]; // IDs of created events
+  modifiedBlocks?: { blockId: string; modifications: Partial<TimeBlock> }[];
+  appliedAt: Date;
+}
+
 // Enhanced Partner types with new features
 export interface Partner {
   id: string;
@@ -800,4 +839,106 @@ export interface ExportOptions {
   filterOptions?: SavedFilter;
   includeTimeline?: boolean;
   includeDocuments?: boolean;
+}
+
+// Subscription Management Types
+export interface Subscription {
+  id: string;
+  name: string;
+  description?: string;
+  cost: number;
+  currency: string;
+  billingCycle: 'monthly' | 'yearly' | 'quarterly' | 'weekly' | 'one-time';
+  category: string;
+  provider: string;
+  website?: string;
+  startDate: Date;
+  nextBillingDate: Date;
+  lastBillingDate?: Date;
+  isActive: boolean;
+  autoRenewal: boolean;
+  cancellationDate?: Date;
+  notes?: string;
+  color?: string;
+  icon?: string;
+  tags: string[];
+  paymentMethod?: string;
+  reminderDays: number; // Days before renewal to remind
+  usageTracking?: {
+    currentUsage: number;
+    limit: number;
+    unit: string;
+  };
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface SubscriptionCategory {
+  id: string;
+  name: string;
+  color: string;
+  icon: string;
+  description?: string;
+  subscriptionCount: number;
+  totalCost: number;
+  createdAt: Date;
+}
+
+export interface SubscriptionTemplate {
+  id: string;
+  name: string;
+  provider: string;
+  category: string;
+  estimatedCost: number;
+  billingCycle: 'monthly' | 'yearly' | 'quarterly' | 'weekly' | 'one-time';
+  description?: string;
+  color?: string;
+  icon?: string;
+  website?: string;
+  popularityScore: number;
+  createdAt: Date;
+}
+
+export interface SubscriptionStats {
+  totalActiveSubscriptions: number;
+  totalInactiveSubscriptions: number;
+  totalMonthlySpend: number;
+  totalYearlySpend: number;
+  averageSubscriptionCost: number;
+  upcomingRenewals: number;
+  expiredSubscriptions: number;
+  categoryBreakdown: { [categoryId: string]: { count: number; cost: number } };
+  monthlyTrend: { month: string; cost: number; count: number }[];
+  costSavings: number; // Potential savings from cancelled subscriptions
+}
+
+export interface SubscriptionReminder {
+  id: string;
+  subscriptionId: string;
+  subscriptionName: string;
+  type: 'renewal' | 'trial_ending' | 'payment_due' | 'price_change' | 'custom';
+  reminderDate: Date;
+  message: string;
+  isRead: boolean;
+  priority: 'low' | 'medium' | 'high';
+  createdAt: Date;
+}
+
+export interface SubscriptionUsageLog {
+  id: string;
+  subscriptionId: string;
+  date: Date;
+  usage: number;
+  notes?: string;
+  createdAt: Date;
+}
+
+export interface SubscriptionPriceHistory {
+  id: string;
+  subscriptionId: string;
+  oldPrice: number;
+  newPrice: number;
+  changeDate: Date;
+  reason?: string;
+  notes?: string;
 }

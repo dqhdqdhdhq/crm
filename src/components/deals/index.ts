@@ -1,0 +1,21 @@
+
+export { DealsTableView } from './DealsTableView';
+export { EnhancedDealsTableView } from './EnhancedDealsTableView';
+export { DealsPipelineView } from './DealsPipelineView';
+export { AdvancedPipelineView } from './AdvancedPipelineView';
+export { DealsCalendarView } from './DealsCalendarView';
+export { EnhancedDealsCalendarView } from './EnhancedDealsCalendarView';
+export { DealsAnalyticsView } from './DealsAnalyticsView';
+export { DealsForecastView } from './DealsForecastView';
+export { AddDealModal } from './AddDealModal';
+export { EnhancedAddDealModal } from './EnhancedAddDealModal';
+export { DealDetailDrawer } from './DealDetailDrawer';
+export { DealScoringPanel } from './DealScoringPanel';
+export { DealActivityTimeline } from './DealActivityTimeline';
+export { AIRecommendationsPanel } from './AIRecommendationsPanel';
+export { SmartFollowUpPanel } from './SmartFollowUpPanel';
+export { BulkActionsToolbar } from './BulkActionsToolbar';
+export { AdvancedFiltersPanel } from './AdvancedFiltersPanel';
+export { FreeTrialsView } from './FreeTrialsView';
+export { TrialSheet } from './TrialSheet';
+export { TrialIndustrySelector } from './TrialIndustrySelector';

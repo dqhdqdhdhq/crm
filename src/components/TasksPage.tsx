@@ -22,7 +22,8 @@ import {
   ArrowRight,
   X,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Building
 } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 import { Task, Session, TaskTemplate } from '../types';
@@ -189,6 +190,61 @@ export function TasksPage() {
   const [templates] = useLocalStorage<TaskTemplate[]>('task-templates', defaultTaskTemplates);
   const [sessions, setSessions] = useLocalStorage<Session[]>('timer-sessions', []);
   // const [timerHistory] = useLocalStorage<TimerHistoryEntry[]>('timer-history', []);
+  
+  // Get partners for linking tasks
+  const [partners] = useLocalStorage<{ id: string; name: string }[]>('partners-simple', []);
+  
+  // Check for pending task creation from partner page
+  useEffect(() => {
+    const pendingTaskData = localStorage.getItem('pending-task-creation');
+    if (pendingTaskData) {
+      try {
+        const taskData = JSON.parse(pendingTaskData);
+        // Create a new task with the partner data
+        const newTask: Task = {
+          id: crypto.randomUUID(),
+          title: taskData.title || '',
+          completed: false,
+          priority: taskData.priority || 'medium',
+          status: taskData.status || 'todo',
+          createdAt: new Date(),
+          description: taskData.description || '',
+          tags: taskData.tags || [],
+          partnerId: taskData.partnerId,
+          partnerName: taskData.partnerName
+        };
+        
+        // Set the task for editing
+        setEditingTask(newTask);
+        setShowNewTaskModal(true);
+        
+        // Clear the pending task data
+        localStorage.removeItem('pending-task-creation');
+      } catch (error) {
+        console.error('Error parsing pending task data:', error);
+        localStorage.removeItem('pending-task-creation');
+      }
+    }
+    
+    // Check for task details to view from partner page
+    const viewTaskData = localStorage.getItem('view-task-details');
+    if (viewTaskData) {
+      try {
+        const taskData = JSON.parse(viewTaskData);
+        // Find the actual task in our tasks array
+        const actualTask = tasks.find(t => t.id === taskData.id);
+        if (actualTask) {
+          setSelectedTaskForModal(actualTask);
+        }
+        
+        // Clear the view task data
+        localStorage.removeItem('view-task-details');
+      } catch (error) {
+        console.error('Error parsing view task data:', error);
+        localStorage.removeItem('view-task-details');
+      }
+    }
+  }, [tasks]);
   
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | 'todo' | 'in-progress' | 'done'>('all');
@@ -898,6 +954,7 @@ export function TasksPage() {
               tags: []
             }}
             templates={templates}
+            partners={partners}
             onSave={handleSaveTask}
             onClose={() => {
               setShowNewTaskModal(false);
@@ -1048,9 +1105,15 @@ function PipelineTaskCard({
         </div>
       )}
       
-      {task.tags && task.tags.length > 0 && (
+      {(task.tags && task.tags.length > 0) || (task.partnerId && task.partnerName) ? (
         <div className="flex flex-wrap gap-1 mt-2">
-          {task.tags.slice(0, 2).map((tag, index) => (
+          {task.partnerId && task.partnerName && (
+            <span className="px-1.5 py-0.5 bg-purple-100 text-purple-700 text-xs rounded flex items-center space-x-1 font-medium">
+              <Building className="w-3 h-3" />
+              <span>{task.partnerName}</span>
+            </span>
+          )}
+          {task.tags && task.tags.slice(0, 2).map((tag, index) => (
             <span
               key={index}
               className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-xs rounded"
@@ -1058,13 +1121,13 @@ function PipelineTaskCard({
               {tag}
             </span>
           ))}
-          {task.tags.length > 2 && (
+          {task.tags && task.tags.length > 2 && (
             <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">
               +{task.tags.length - 2}
             </span>
           )}
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
@@ -1181,9 +1244,15 @@ function TaskCard({
             )}
           </div>
           
-          {task.tags && task.tags.length > 0 && (
+          {((task.tags && task.tags.length > 0) || (task.partnerId && task.partnerName)) && (
             <div className="flex items-center space-x-2 mt-3">
-              {task.tags.map((tag, index) => (
+              {task.partnerId && task.partnerName && (
+                <span className="flex items-center space-x-1 px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-lg font-medium">
+                  <Building className="w-3 h-3" />
+                  <span>{task.partnerName}</span>
+                </span>
+              )}
+              {task.tags && task.tags.map((tag, index) => (
                 <span
                   key={index}
                   className="flex items-center space-x-1 px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-lg"
@@ -1205,9 +1274,10 @@ interface TaskModalProps {
   templates: TaskTemplate[];
   onSave: (task: Task) => void;
   onClose: () => void;
+  partners?: { id: string; name: string }[];
 }
 
-function TaskModal({ task, templates, onSave, onClose }: TaskModalProps) {
+function TaskModal({ task, templates, onSave, onClose, partners }: TaskModalProps) {
   const [editedTask, setEditedTask] = useState(task);
   const [selectedTemplate, setSelectedTemplate] = useState<string>('');
 
@@ -1370,6 +1440,37 @@ function TaskModal({ task, templates, onSave, onClose }: TaskModalProps) {
               placeholder="development, urgent, review"
             />
           </div>
+
+          {partners && partners.length > 0 && (
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Link to Partner</label>
+              <select
+                value={editedTask.partnerId || ''}
+                onChange={(e) => {
+                  const selectedPartnerId = e.target.value;
+                  const selectedPartner = partners.find(p => p.id === selectedPartnerId);
+                  setEditedTask({ 
+                    ...editedTask, 
+                    partnerId: selectedPartnerId || undefined,
+                    partnerName: selectedPartner?.name || undefined
+                  });
+                }}
+                className="w-full px-4 py-3 bg-white/70 backdrop-blur-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all duration-200"
+              >
+                <option value="">No partner selected</option>
+                {partners.map((partner) => (
+                  <option key={partner.id} value={partner.id}>
+                    {partner.name}
+                  </option>
+                ))}
+              </select>
+              {editedTask.partnerId && (
+                <p className="mt-2 text-sm text-gray-500">
+                  This task will be linked to <span className="font-medium text-blue-600">{editedTask.partnerName}</span>
+                </p>
+              )}
+            </div>
+          )}
 
           <div className="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
             <button

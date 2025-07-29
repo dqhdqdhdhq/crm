@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 
 // Helper function to revive Date objects from JSON
 function reviveDates(key: string, value: any): any {
-  // List of keys that should be Date objects
-  const dateKeys = ['createdAt', 'updatedAt', 'date'];
+  // Automatically revive any key that looks like a date field
+  // e.g. createdAt, updatedAt, startDate, nextBillingDate, dueDate, etc.
+  const isPossibleDateKey = /date$/i.test(key) || /At$/.test(key) || key.toLowerCase().includes('date');
   
-  if (dateKeys.includes(key) && typeof value === 'string') {
+  if (isPossibleDateKey && typeof value === 'string') {
     const date = new Date(value);
     // Check if it's a valid date
     if (!isNaN(date.getTime())) {
