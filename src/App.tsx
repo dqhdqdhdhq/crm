@@ -12,6 +12,7 @@ import { GlobalFocusTimer } from './components/GlobalFocusTimer';
 // import { TestPage } from './components/TestPage';
 import { EnhancedCalendarPage } from './components/EnhancedCalendarPage';
 import { Calculator } from './components/Calculator';
+import { CommandCentre } from './components/commandCentre/CommandCentre';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { Page, PageTemplate, PageCategory } from './types';
 import { Calculator as CalculatorIcon, Timer, CreditCard } from 'lucide-react';
@@ -167,7 +168,7 @@ function App() {
   const [pages, setPages] = useLocalStorage<Page[]>('pages', defaultPages);
   const [pageTemplates, setPageTemplates] = useLocalStorage<PageTemplate[]>('pageTemplates', defaultPageTemplates);
   const [pageCategories, setPageCategories] = useLocalStorage<PageCategory[]>('pageCategories', defaultPageCategories);
-  const [activeSection, setActiveSection] = useState<string>('tasks');
+  const [activeSection, setActiveSection] = useState<string>('command-centre');
   const [activePageId, setActivePageId] = useState<string | null>(null);
   const [showCalculator, setShowCalculator] = useState(false);
   const [showFocusTimer, setShowFocusTimer] = useState(false);
@@ -252,7 +253,9 @@ function App() {
   };
 
   const renderMainContent = () => {
-    if (activeSection === 'tasks') {
+    if (activeSection === 'command-centre') {
+      return <CommandCentre />;
+    } else if (activeSection === 'tasks') {
       return <TasksPage />;
     } else if (activeSection === 'pages') {
       return (

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { 
+import {
   FileText,
   Plus,
   Calendar,
@@ -13,7 +13,8 @@ import {
   ChevronLeft,
   ChevronRight,
   DollarSign,
-  CreditCard
+  CreditCard,
+  Target
 } from 'lucide-react';
 import { Page } from '../types';
 
@@ -26,6 +27,7 @@ interface SidebarProps {
 }
 
 const navigationItems = [
+  { id: 'command-centre', icon: Target, label: 'Command Centre' },
   { id: 'tasks', icon: CheckSquare, label: 'Tasks' },
   { id: 'pages', icon: FileText, label: 'Pages' },
   { id: 'calendar', icon: Calendar, label: 'Calendar' },
