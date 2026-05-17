@@ -297,6 +297,123 @@ table {
   }
 }
 
+/* Make all lucide icons feel more SF-Symbol-like (thinner, finer strokes) */
+svg.lucide {
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* iOS-flavored surfaces (Liquid Glass / widget aesthetic) */
+.ios-surface {
+  /* canvas behind iOS-style cards */
+  background:
+    radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.07) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(236, 72, 153, 0.05) 0px, transparent 50%),
+    radial-gradient(at 50% 100%, rgba(56, 189, 248, 0.06) 0px, transparent 50%),
+    #f6f6f8;
+}
+
+/* Neutralize the global hover-lift inside iOS surfaces for a calmer feel */
+.ios-surface button:hover { transform: none; }
+.ios-surface button:active { transform: scale(0.97); }
+.ios-press:active { transform: scale(0.96) !important; opacity: 0.85; }
+
+.ios-card {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: saturate(180%) blur(28px);
+  -webkit-backdrop-filter: saturate(180%) blur(28px);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 8px 24px -12px rgba(15, 23, 42, 0.12);
+  border-radius: 22px;
+}
+
+.ios-card-elev {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: saturate(180%) blur(32px);
+  -webkit-backdrop-filter: saturate(180%) blur(32px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.95) inset,
+    0 2px 6px rgba(15, 23, 42, 0.05),
+    0 18px 40px -18px rgba(15, 23, 42, 0.18);
+  border-radius: 28px;
+}
+
+.ios-toolbar {
+  background: rgba(246, 246, 248, 0.72);
+  backdrop-filter: saturate(180%) blur(24px);
+  -webkit-backdrop-filter: saturate(180%) blur(24px);
+  border-bottom: 0.5px solid rgba(60, 60, 67, 0.18);
+}
+
+.ios-segmented {
+  background: rgba(120, 120, 128, 0.12);
+  border-radius: 12px;
+  padding: 2px;
+  display: inline-flex;
+  gap: 2px;
+}
+
+.ios-segment {
+  padding: 6px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(60, 60, 67, 0.78);
+  letter-spacing: -0.01em;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background-color 200ms ease, color 200ms ease, box-shadow 200ms ease;
+  white-space: nowrap;
+}
+
+.ios-segment:hover { color: #111; }
+
+.ios-segment-active {
+  background: #fff;
+  color: #111;
+  box-shadow:
+    0 3px 8px rgba(15, 23, 42, 0.08),
+    0 1px 2px rgba(15, 23, 42, 0.06);
+}
+
+.ios-large-title {
+  font-size: 34px;
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.022em;
+  color: #0b1220;
+}
+
+.ios-subtitle {
+  font-size: 15px;
+  color: rgba(60, 60, 67, 0.7);
+  letter-spacing: -0.01em;
+}
+
+.ios-section-title {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: rgba(60, 60, 67, 0.55);
+}
+
+.ios-divider { border-color: rgba(60, 60, 67, 0.1); }
+
+.ios-pill {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
 /* Calculator specific styles */
 .calculator-button {
   user-select: none;
@@ -331,4 +448,211 @@ table {
 /* Smooth scrolling for the entire app */
 html {
   scroll-behavior: smooth;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Clients page — Atlas / Portfolio / List / Detail-sheet specific tokens.
+   Kept here (not in components) so the iOS aesthetic is centralised.
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* KPI chip in the toolbar */
+.kpi-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 10px; border-radius: 999px;
+  background: rgba(120,120,128,0.10);
+  color: #475569;
+  font-size: 12px; white-space: nowrap;
+  transition: box-shadow 200ms ease, background-color 200ms ease;
+}
+.kpi-chip:hover { background: rgba(120,120,128,0.16); }
+
+/* Stage filter chip */
+.stage-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px; border-radius: 999px;
+  background: rgba(120,120,128,0.08);
+  color: rgba(60,60,67,0.78);
+  font-size: 11.5px; font-weight: 600; letter-spacing: -0.005em;
+  white-space: nowrap;
+  transition: background-color 200ms ease, box-shadow 200ms ease, color 200ms ease;
+}
+.stage-chip:hover { background: rgba(120,120,128,0.14); }
+
+.priority-card {
+  border-radius: 18px;
+  transition: border-color 200ms ease, box-shadow 200ms ease, background-color 200ms ease;
+}
+.priority-card:hover {
+  background: rgba(255,255,255,0.88);
+  border-color: rgba(59,130,246,0.20);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.95) inset,
+    0 12px 30px -18px rgba(15,23,42,0.26);
+}
+
+/* Atlas canvas — soft cartography backdrop */
+.atlas-canvas {
+  background: #f4f6fb;
+  min-height: 100%;
+  height: 100%;
+}
+.atlas-bg {
+  background:
+    radial-gradient(at 18% 22%, rgba(99,102,241,0.10) 0px, transparent 38%),
+    radial-gradient(at 78% 18%, rgba(56,189,248,0.10) 0px, transparent 42%),
+    radial-gradient(at 65% 88%, rgba(236,72,153,0.08) 0px, transparent 38%),
+    linear-gradient(180deg, #f6f8fc 0%, #eef2f7 100%);
+}
+.atlas-grid {
+  background-image:
+    linear-gradient(to right,  rgba(15,23,42,0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15,23,42,0.05) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse at center, black 50%, transparent 90%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 50%, transparent 90%);
+}
+
+/* Atlas filter chip (top-left rail) */
+.atlas-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 10px; border-radius: 999px;
+  background: rgba(255,255,255,0.6);
+  color: rgba(60,60,67,0.6);
+  font-size: 11px; font-weight: 600; letter-spacing: -0.005em;
+  white-space: nowrap;
+  transition: background-color 200ms ease, box-shadow 200ms ease, color 200ms ease;
+}
+.atlas-chip:hover { background: rgba(255,255,255,0.85); color: #111; }
+.atlas-chip-on  { background: #fff; }
+
+/* Atlas pin — teardrop with pulsing halo */
+.atlas-pin {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  background: transparent;
+  filter: drop-shadow(0 4px 8px rgba(15,23,42,0.25));
+}
+.atlas-pin-shape {
+  position: relative;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow:
+    0 0 0 3px rgba(255,255,255,0.85),
+    inset 0 1px 0 rgba(255,255,255,0.4);
+  transition: transform 200ms cubic-bezier(0.32,0.72,0,1), box-shadow 200ms ease;
+}
+.atlas-pin-shape-on {
+  transform: translateY(-2px) scale(1.12);
+  box-shadow:
+    0 0 0 4px rgba(255,255,255,0.95),
+    0 0 0 7px rgba(59,130,246,0.18),
+    inset 0 1px 0 rgba(255,255,255,0.5);
+}
+.atlas-pin-stem {
+  width: 2px;
+  height: 6px;
+  margin-top: -2px;
+  border-radius: 0 0 2px 2px;
+  opacity: 0.85;
+}
+.atlas-pin-pulse {
+  position: absolute;
+  top: 7px; left: 50%;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  transform: translate(-50%, 0);
+  opacity: 0;
+  animation: atlasPulse 2.4s ease-out infinite;
+  pointer-events: none;
+}
+@keyframes atlasPulse {
+  0%   { transform: translate(-50%, 0) scale(0.4); opacity: 0.5; }
+  80%  { transform: translate(-50%, 0) scale(2.6); opacity: 0; }
+  100% { transform: translate(-50%, 0) scale(2.6); opacity: 0; }
+}
+
+/* Atlas pin hover card */
+.atlas-pin-card {
+  position: absolute;
+  top: -8px; left: 50%;
+  transform: translate(-50%, -100%);
+  padding: 8px 10px;
+  min-width: 180px;
+  max-width: 240px;
+  z-index: 30;
+  pointer-events: none;
+}
+
+/* Portfolio quadrant chart */
+.portfolio-grid {
+  background:
+    radial-gradient(at 0% 0%, rgba(56,189,248,0.08) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(16,185,129,0.10) 0px, transparent 55%),
+    radial-gradient(at 0% 100%, rgba(148,163,184,0.10) 0px, transparent 55%),
+    radial-gradient(at 100% 100%, rgba(244,63,94,0.10) 0px, transparent 50%),
+    #fafafc;
+  background-image:
+    linear-gradient(to right,  rgba(15,23,42,0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15,23,42,0.04) 1px, transparent 1px),
+    radial-gradient(at 0% 0%, rgba(56,189,248,0.08) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(16,185,129,0.10) 0px, transparent 55%),
+    radial-gradient(at 0% 100%, rgba(148,163,184,0.10) 0px, transparent 55%),
+    radial-gradient(at 100% 100%, rgba(244,63,94,0.10) 0px, transparent 50%);
+  background-size: 40px 40px, 40px 40px, auto, auto, auto, auto;
+  border: 1px solid rgba(15,23,42,0.06);
+}
+.quad-label {
+  position: absolute;
+  font-size: 9.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  color: rgba(60,60,67,0.42);
+  pointer-events: none;
+}
+
+/* Slide-over sheet (Detail panel) */
+.client-sheet {
+  background: rgba(252, 252, 254, 0.92);
+  backdrop-filter: saturate(180%) blur(32px);
+  -webkit-backdrop-filter: saturate(180%) blur(32px);
+  border-left: 1px solid rgba(15,23,42,0.06);
+  box-shadow: -16px 0 48px -20px rgba(15,23,42,0.18);
+  animation: sheetIn 320ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+@keyframes sheetIn {
+  from { transform: translateX(24px); opacity: 0.7; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+/* Health range slider with custom track */
+.health-range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(to right, #ef4444 0%, #f97316 35%, #f59e0b 55%, #10b981 75%, #059669 100%);
+  outline: none;
+}
+.health-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: white;
+  box-shadow:
+    0 1px 3px rgba(15,23,42,0.2),
+    0 0 0 1.5px rgba(15,23,42,0.08);
+  cursor: pointer;
+  transition: transform 120ms ease;
+}
+.health-range::-webkit-slider-thumb:active { transform: scale(1.15); }
+.health-range::-moz-range-thumb {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 1px 3px rgba(15,23,42,0.2);
+  cursor: pointer;
+  border: none;
 }

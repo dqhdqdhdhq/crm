@@ -3,8 +3,7 @@ import { Sidebar } from './components/Sidebar';
 import { TasksPage } from './components/TasksPage';
 import { NotionPage } from './components/NotionPage';
 import { PagesOverview } from './components/PagesOverview';
-import { ProspectsPage } from './components/ProspectsPage';
-import { PartnersPage } from './components/PartnersPage';
+import { ClientsPage } from './components/clients/ClientsPage';
 import { SubscriptionModal } from './components/SubscriptionModal';
 import { FocusTimer } from './components/FocusTimer';
 import { GlobalFocusTimer } from './components/GlobalFocusTimer';
@@ -274,10 +273,15 @@ function App() {
       );
     } else if (activeSection === 'calendar') {
       return <EnhancedCalendarPage />;
-    } else if (activeSection === 'prospects') {
-      return <ProspectsPage />;
-    } else if (activeSection === 'partners') {
-      return <PartnersPage onNavigate={setActiveSection} />;
+    } else if (activeSection === 'clients') {
+      return (
+        <ClientsPage
+          onOpenInDealDesk={(leadId) => {
+            try { sessionStorage.setItem('dealdesk-focus-lead', leadId); } catch {}
+            setActiveSection('command-centre');
+          }}
+        />
+      );
     } else if (activeSection === 'focus') {
       return <FocusTimer />;
     } else if (activeSection === 'page' && activePageId) {
@@ -307,7 +311,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 flex relative">
+    <div className="min-h-screen ios-surface flex relative">
       <Sidebar
         activeSection={activeSection}
         onSectionSelect={handleSectionSelect}
@@ -322,7 +326,7 @@ function App() {
         </div>
         
         {/* Global Action Buttons */}
-        <div className="fixed bottom-6 left-6 flex flex-col space-y-3 z-30">
+        <div className="hidden md:flex fixed bottom-6 left-6 flex-col space-y-3 z-30">
           {/* Focus Timer Button */}
           <button
             onClick={() => setShowFocusTimer(!showFocusTimer)}

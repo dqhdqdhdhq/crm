@@ -73,7 +73,22 @@ export interface TaskTemplate {
 }
 
 // Notion-like page types
-export type BlockType = 'text' | 'heading' | 'image' | 'file' | 'date' | 'table' | 'list' | 'quote' | 'divider' | 'code';
+export type BlockType =
+  | 'text'
+  | 'heading'
+  | 'image'
+  | 'file'
+  | 'date'
+  | 'table'
+  | 'list'
+  | 'bullet'
+  | 'numbered'
+  | 'todo'
+  | 'toggle'
+  | 'callout'
+  | 'quote'
+  | 'divider'
+  | 'code';
 
 export interface BaseBlock {
   id: string;
@@ -127,10 +142,44 @@ export interface TableBlock extends BaseBlock {
   rows: string[][];
 }
 
+// Legacy multi-item list block - kept for backward compatibility.
 export interface ListBlock extends BaseBlock {
   type: 'list';
   items: string[];
   ordered: boolean;
+}
+
+// Notion-style single-item blocks. Enter creates a new sibling, Backspace at start converts to text.
+export interface BulletBlock extends BaseBlock {
+  type: 'bullet';
+  content: string;
+}
+
+export interface NumberedBlock extends BaseBlock {
+  type: 'numbered';
+  content: string;
+}
+
+export interface TodoBlock extends BaseBlock {
+  type: 'todo';
+  content: string;
+  checked: boolean;
+}
+
+export interface ToggleBlock extends BaseBlock {
+  type: 'toggle';
+  content: string;
+  open?: boolean;
+  childIds?: string[];
+}
+
+export type CalloutColor = 'gray' | 'blue' | 'green' | 'yellow' | 'red' | 'purple';
+
+export interface CalloutBlock extends BaseBlock {
+  type: 'callout';
+  content: string;
+  emoji?: string;
+  color?: CalloutColor;
 }
 
 export interface QuoteBlock extends BaseBlock {
@@ -149,17 +198,35 @@ export interface CodeBlock extends BaseBlock {
   language?: string;
 }
 
-export type Block = TextBlock | HeadingBlock | ImageBlock | FileBlock | DateBlock | TableBlock | ListBlock | QuoteBlock | DividerBlock | CodeBlock;
+export type Block =
+  | TextBlock
+  | HeadingBlock
+  | ImageBlock
+  | FileBlock
+  | DateBlock
+  | TableBlock
+  | ListBlock
+  | BulletBlock
+  | NumberedBlock
+  | TodoBlock
+  | ToggleBlock
+  | CalloutBlock
+  | QuoteBlock
+  | DividerBlock
+  | CodeBlock;
 
 export interface Page {
   id: string;
   title: string;
   emoji?: string;
   cover?: string;
+  parentId?: string;
+  childIds?: string[];
   blocks: Block[];
   createdAt: Date;
   updatedAt: Date;
   templateId?: string;
+  favorite?: boolean;
 }
 
 export interface PageTemplate {
