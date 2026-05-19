@@ -88,7 +88,11 @@ export type BlockType =
   | 'callout'
   | 'quote'
   | 'divider'
-  | 'code';
+  | 'code'
+  // Canvas / Miro elements:
+  | 'sticky'
+  | 'shape'
+  | 'arrow';
 
 export interface BaseBlock {
   id: string;
@@ -198,6 +202,38 @@ export interface CodeBlock extends BaseBlock {
   language?: string;
 }
 
+// === Canvas / Miro elements ===
+
+export type StickyColor = 'yellow' | 'pink' | 'blue' | 'green' | 'orange' | 'purple' | 'gray';
+
+export interface StickyBlock extends BaseBlock {
+  type: 'sticky';
+  content: string;
+  color: StickyColor;
+}
+
+export type ShapeKind = 'rect' | 'rounded' | 'circle' | 'diamond';
+export type ShapeColor = 'gray' | 'blue' | 'green' | 'yellow' | 'red' | 'purple' | 'white';
+
+export interface ShapeBlock extends BaseBlock {
+  type: 'shape';
+  shape: ShapeKind;
+  content?: string;
+  color: ShapeColor;
+}
+
+export interface ArrowBlock extends BaseBlock {
+  type: 'arrow';
+  fromBlockId?: string;
+  toBlockId?: string;
+  /** Free endpoint used when the arrow isn't anchored to a block. Canvas coordinates. */
+  fromPoint?: { x: number; y: number };
+  toPoint?: { x: number; y: number };
+  label?: string;
+  style?: 'solid' | 'dashed';
+  color?: string;
+}
+
 export type Block =
   | TextBlock
   | HeadingBlock
@@ -213,7 +249,22 @@ export type Block =
   | CalloutBlock
   | QuoteBlock
   | DividerBlock
-  | CodeBlock;
+  | CodeBlock
+  | StickyBlock
+  | ShapeBlock
+  | ArrowBlock;
+
+export type PageWidth = 'narrow' | 'full';
+export type PageLayout = 'document' | 'canvas';
+
+export interface CanvasBlockLayout {
+  x: number;
+  y: number;
+  w?: number;
+  h?: number;
+  /** Higher = drawn on top. Defaults to insertion order. */
+  z?: number;
+}
 
 export interface Page {
   id: string;
@@ -227,6 +278,12 @@ export interface Page {
   updatedAt: Date;
   templateId?: string;
   favorite?: boolean;
+  width?: PageWidth;
+  layout?: PageLayout;
+  /** Per-block positions used only when layout === 'canvas'. Keyed by block id. */
+  canvasLayout?: Record<string, CanvasBlockLayout>;
+  /** Saved canvas viewport (pan + zoom) so the user returns to the same view. */
+  canvasViewport?: { x: number; y: number; scale: number };
 }
 
 export interface PageTemplate {

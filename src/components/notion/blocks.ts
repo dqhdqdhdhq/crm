@@ -109,6 +109,12 @@ export function createBlock(kind: SlashItemKind): Block {
       return { ...base, type: 'date', date: new Date() };
     case 'list':
       return { ...base, type: 'list', items: [''], ordered: false };
+    case 'sticky':
+      return { ...base, type: 'sticky', content: '', color: 'yellow' };
+    case 'shape':
+      return { ...base, type: 'shape', shape: 'rect', content: '', color: 'white' };
+    case 'arrow':
+      return { ...base, type: 'arrow', style: 'solid' };
     case 'subpage':
       // Handled by caller (creates a real Page and inserts a pageLink-style block).
       // Fallback to a text placeholder if used directly.

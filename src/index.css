@@ -656,3 +656,51 @@ html {
   cursor: pointer;
   border: none;
 }
+
+/* ------------------------------------------------------------------
+   Notion editor styling
+------------------------------------------------------------------ */
+
+/* Disable the global button hover lift inside editor controls so the
+   inline grip / plus / more buttons don't jump while typing. */
+.editable-block,
+.editable-block * {
+  transition: none !important;
+}
+
+/* contentEditable placeholder */
+.editable-block:empty::before,
+.editable-block[data-placeholder]:empty::before {
+  content: attr(data-placeholder);
+  color: #cbd5e1;
+  pointer-events: none;
+  display: inline-block;
+}
+
+/* Inline page link mention */
+a.page-link {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2px;
+  padding: 0 4px;
+  margin: 0 1px;
+  border-radius: 4px;
+  background: rgba(59, 130, 246, 0.08);
+  color: #1d4ed8;
+  text-decoration: underline;
+  text-decoration-color: rgba(59, 130, 246, 0.35);
+  text-underline-offset: 2px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+
+a.page-link:hover {
+  background: rgba(59, 130, 246, 0.15);
+}
+
+/* Strip the global button-hover lift inside editor buttons */
+.slash-menu button:hover,
+.page-link-popup button:hover {
+  transform: none;
+}

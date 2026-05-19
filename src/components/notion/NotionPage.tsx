@@ -17,8 +17,13 @@ import {
   Star,
   X,
   Type,
+  Maximize2,
+  Minimize2,
+  FileText,
+  LayoutGrid,
 } from 'lucide-react';
 import { Block, BlockType, Page, CalloutColor } from '../../types';
+import { Canvas } from './Canvas';
 import {
   SLASH_ITEMS,
   SlashItem,
@@ -348,7 +353,7 @@ export function NotionPage({
 
       {/* Sticky header bar */}
       <div className="sticky top-0 bg-white/90 backdrop-blur-xl border-b border-gray-100 z-20">
-        <div className="max-w-3xl mx-auto px-8 py-3 flex items-center justify-between">
+        <div className="px-6 py-2 flex items-center justify-between gap-4">
           <button
             onClick={onBack}
             className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 font-medium"
@@ -356,7 +361,47 @@ export function NotionPage({
             <ArrowLeft className="w-4 h-4" />
             <span>All Pages</span>
           </button>
-          <div className="flex items-center gap-3 text-xs text-gray-500">
+          <div className="flex items-center gap-2 text-xs text-gray-500">
+            {/* Layout toggle: Document vs Canvas */}
+            <div className="flex items-center bg-gray-100 rounded-md p-0.5">
+              <button
+                onClick={() => updatePage({ layout: 'document' })}
+                className={`flex items-center gap-1 px-2 py-1 text-xs font-medium rounded transition-colors ${
+                  (page.layout ?? 'document') === 'document'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-500 hover:text-gray-800'
+                }`}
+                title="Document layout"
+              >
+                <FileText className="w-3 h-3" />
+                <span>Doc</span>
+              </button>
+              <button
+                onClick={() => updatePage({ layout: 'canvas' })}
+                className={`flex items-center gap-1 px-2 py-1 text-xs font-medium rounded transition-colors ${
+                  page.layout === 'canvas'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-500 hover:text-gray-800'
+                }`}
+                title="Canvas (Miro-style)"
+              >
+                <LayoutGrid className="w-3 h-3" />
+                <span>Canvas</span>
+              </button>
+            </div>
+
+            {/* Width toggle — only meaningful in document mode */}
+            {(page.layout ?? 'document') === 'document' && (
+              <button
+                onClick={() => updatePage({ width: page.width === 'full' ? 'narrow' : 'full' })}
+                className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md"
+                title={page.width === 'full' ? 'Switch to narrow width' : 'Switch to full width'}
+              >
+                {page.width === 'full' ? <Minimize2 className="w-3 h-3" /> : <Maximize2 className="w-3 h-3" />}
+                <span>{page.width === 'full' ? 'Narrow' : 'Full width'}</span>
+              </button>
+            )}
+
             <button
               onClick={() => updatePage({ favorite: !page.favorite })}
               className={`p-1.5 rounded-md hover:bg-gray-100 ${page.favorite ? 'text-amber-500' : 'text-gray-400'}`}
@@ -364,12 +409,74 @@ export function NotionPage({
             >
               <Star className="w-4 h-4" fill={page.favorite ? 'currentColor' : 'none'} />
             </button>
-            <span>Last edited {new Date(page.updatedAt).toLocaleString()}</span>
+            <span className="hidden md:inline">Last edited {new Date(page.updatedAt).toLocaleString()}</span>
           </div>
         </div>
       </div>
 
-      <div className={`max-w-3xl mx-auto px-8 ${page.cover ? 'pt-12' : 'pt-16'} pb-24`}>
+      {/* CANVAS LAYOUT — Miro-style infinite freeform mode */}
+      {page.layout === 'canvas' ? (
+        <div className={`${page.width === 'full' ? 'max-w-none' : 'max-w-7xl mx-auto'} px-4 pt-4`}>
+          {/* Compact title row for canvas mode */}
+          <div className="flex items-center gap-3 mb-3">
+            {page.emoji && (
+              <button
+                onClick={(e) => {
+                  const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                  setShowIconPicker({ top: rect.bottom + 6, left: rect.left });
+                }}
+                className="text-3xl hover:bg-gray-50 rounded-lg p-1 -ml-1 transition-colors"
+              >
+                {page.emoji}
+              </button>
+            )}
+            <input
+              type="text"
+              value={page.title}
+              onChange={(e) => updatePage({ title: e.target.value })}
+              placeholder="Untitled"
+              className="flex-1 bg-transparent border-none outline-none text-2xl font-bold text-gray-900 placeholder-gray-300"
+            />
+          </div>
+          <Canvas
+            page={page}
+            pages={pages}
+            onUpdatePage={onUpdatePage}
+            onSelectPage={onSelectPage}
+            onCreatePage={onCreatePage}
+            renderBlock={(block, onUpdate, _onSelectPage) => (
+              <BlockBody
+                block={block}
+                pages={pages}
+                registerRef={() => {
+                  /* registration not needed for canvas inline editing */
+                }}
+                onUpdate={onUpdate}
+                onEnter={() => {
+                  /* canvas blocks soft-break instead — multiLine handles it */
+                }}
+                onBackspaceEmpty={() => {
+                  // No-op in canvas (delete via the block's × button instead).
+                }}
+                onSelectPage={onSelectPage}
+                onSlashOpen={() => {}}
+                onSlashUpdate={() => {}}
+                onSlashClose={() => {}}
+                onLinkOpen={() => {}}
+                onLinkUpdate={() => {}}
+                onLinkClose={() => {}}
+                onMarkdownTransform={(kind, rest) => {
+                  const converted = convertBlock(block, kind, rest);
+                  onUpdate(converted);
+                }}
+                multiLine
+              />
+            )}
+          />
+        </div>
+      ) : (
+      /* DOCUMENT LAYOUT — Notion-style linear */
+      <div className={`${page.width === 'full' ? 'max-w-none px-12' : 'max-w-3xl mx-auto px-8'} ${page.cover ? 'pt-12' : 'pt-16'} pb-24`}>
         {/* Cover/icon shortcuts (visible when not yet set) */}
         {(!page.emoji || !page.cover) && (
           <div className="flex items-center gap-3 mb-3 -ml-1 opacity-60 hover:opacity-100 transition-opacity">
@@ -427,9 +534,9 @@ export function NotionPage({
           className="w-full bg-transparent border-none outline-none resize-none text-5xl font-bold text-gray-900 placeholder-gray-300 leading-tight mb-6 overflow-hidden"
         />
 
-        {/* Blocks */}
+        {/* Blocks — skip canvas-only types in document mode */}
         <div className="space-y-1">
-          {page.blocks.map((block) => (
+          {page.blocks.filter((b) => b.type !== 'sticky' && b.type !== 'shape' && b.type !== 'arrow').map((block) => (
             <BlockRow
               key={block.id}
               block={block}
@@ -444,12 +551,27 @@ export function NotionPage({
                 const after = createBlock('text');
                 insertBlockAfter(block.id, after);
               }}
-              onBackspaceEmpty={() => deleteBlock(block.id)}
+              onBackspaceEmpty={() => {
+                // Notion-style: non-text empty block first converts to text,
+                // a second backspace then deletes / merges with previous.
+                if (block.type !== 'text') {
+                  const converted = convertBlock(block, 'text', '');
+                  replaceBlock(block.id, converted);
+                  setFocusBlockId({ id: block.id, pos: 'start' });
+                } else {
+                  deleteBlock(block.id);
+                }
+              }}
               onDuplicate={() => duplicateBlock(block.id)}
               onDelete={() => deleteBlock(block.id)}
               onTurnInto={(kind) => {
                 const converted = convertBlock(block, kind);
                 replaceBlock(block.id, converted);
+              }}
+              onMarkdownTransform={(kind, rest) => {
+                const converted = convertBlock(block, kind, rest);
+                replaceBlock(block.id, converted);
+                setFocusBlockId({ id: block.id, pos: 'end' });
               }}
               onSlashOpen={(query, anchor) => setSlash({ blockId: block.id, query, index: 0, anchor })}
               onSlashUpdate={(query) => slash && slash.blockId === block.id && setSlash({ ...slash, query, index: 0 })}
@@ -532,6 +654,7 @@ export function NotionPage({
         {/* Backlinks */}
         <Backlinks currentPageId={page.id} allPages={pages} onSelect={onSelectPage} />
       </div>
+      )}
 
       {/* Popups */}
       {slash && (
@@ -603,6 +726,7 @@ interface BlockRowProps {
   onDuplicate: () => void;
   onDelete: () => void;
   onTurnInto: (kind: SlashItemKind) => void;
+  onMarkdownTransform: (kind: SlashItemKind, rest: string) => void;
   onSlashOpen: (query: string, anchor: AnchorPos) => void;
   onSlashUpdate: (query: string) => void;
   onSlashClose: () => void;
@@ -621,7 +745,8 @@ interface BlockRowProps {
 function BlockRow(props: BlockRowProps) {
   const {
     block, pages, registerRef, onUpdate, onEnter, onBackspaceEmpty,
-    onDuplicate, onDelete, onTurnInto, onSlashOpen, onSlashUpdate, onSlashClose,
+    onDuplicate, onDelete, onTurnInto, onMarkdownTransform,
+    onSlashOpen, onSlashUpdate, onSlashClose,
     onLinkOpen, onLinkUpdate, onLinkClose, onSelectPage,
     onDragStart, onDragEnd, onDragOver, onDrop, isDragTarget, isDragging,
   } = props;
@@ -765,12 +890,7 @@ function BlockRow(props: BlockRowProps) {
           onLinkOpen={onLinkOpen}
           onLinkUpdate={onLinkUpdate}
           onLinkClose={onLinkClose}
-          onMarkdownTransform={(kind, rest) => {
-            const converted = convertBlock(block, kind, rest);
-            // Replace + focus end via parent? simplest: just replace via onUpdate-ish flow.
-            // We need replace + focus. The parent passes onTurnInto which preserves content; we want rest.
-            onUpdate(converted);
-          }}
+          onMarkdownTransform={onMarkdownTransform}
         />
       </div>
     </div>
@@ -792,12 +912,13 @@ interface BlockBodyProps {
   onLinkUpdate: (query: string) => void;
   onLinkClose: () => void;
   onMarkdownTransform: (kind: SlashItemKind, rest: string) => void;
+  multiLine?: boolean;
 }
 
-function BlockBody(props: BlockBodyProps) {
+export function BlockBody(props: BlockBodyProps) {
   const { block, pages, registerRef, onUpdate, onEnter, onBackspaceEmpty,
           onSelectPage, onSlashOpen, onSlashUpdate, onSlashClose,
-          onLinkOpen, onLinkUpdate, onLinkClose, onMarkdownTransform } = props;
+          onLinkOpen, onLinkUpdate, onLinkClose, onMarkdownTransform, multiLine } = props;
 
   switch (block.type) {
     case 'text':
@@ -815,6 +936,7 @@ function BlockBody(props: BlockBodyProps) {
           onLinkUpdate={onLinkUpdate}
           onLinkClose={onLinkClose}
           onMarkdownTransform={onMarkdownTransform}
+          multiLine={multiLine}
           registerRef={registerRef}
           className="text-base text-gray-800 leading-7 py-0.5"
         />
@@ -845,6 +967,7 @@ function BlockBody(props: BlockBodyProps) {
           onLinkUpdate={onLinkUpdate}
           onLinkClose={onLinkClose}
           onMarkdownTransform={onMarkdownTransform}
+          multiLine={multiLine}
           registerRef={registerRef}
           className={`${sizes[block.level]} ${pad[block.level]} text-gray-900`}
         />
@@ -868,6 +991,7 @@ function BlockBody(props: BlockBodyProps) {
             onLinkUpdate={onLinkUpdate}
             onLinkClose={onLinkClose}
             onMarkdownTransform={onMarkdownTransform}
+            multiLine={multiLine}
             registerRef={registerRef}
             className="flex-1 text-base text-gray-800 leading-7"
           />
@@ -891,6 +1015,7 @@ function BlockBody(props: BlockBodyProps) {
             onLinkUpdate={onLinkUpdate}
             onLinkClose={onLinkClose}
             onMarkdownTransform={onMarkdownTransform}
+            multiLine={multiLine}
             registerRef={registerRef}
             className="flex-1 text-base text-gray-800 leading-7"
           />
@@ -919,6 +1044,7 @@ function BlockBody(props: BlockBodyProps) {
             onLinkUpdate={onLinkUpdate}
             onLinkClose={onLinkClose}
             onMarkdownTransform={onMarkdownTransform}
+            multiLine={multiLine}
             registerRef={registerRef}
             className={`flex-1 text-base leading-7 ${block.checked ? 'text-gray-400 line-through' : 'text-gray-800'}`}
           />
@@ -949,6 +1075,7 @@ function BlockBody(props: BlockBodyProps) {
               onLinkUpdate={onLinkUpdate}
               onLinkClose={onLinkClose}
               onMarkdownTransform={onMarkdownTransform}
+              multiLine={multiLine}
               registerRef={registerRef}
               className="flex-1 text-base text-gray-800 leading-7 font-medium"
             />
@@ -997,6 +1124,7 @@ function BlockBody(props: BlockBodyProps) {
             onLinkUpdate={onLinkUpdate}
             onLinkClose={onLinkClose}
             onMarkdownTransform={onMarkdownTransform}
+            multiLine={multiLine}
             registerRef={registerRef}
             className="flex-1 text-base text-gray-800 leading-7"
           />
@@ -1020,6 +1148,7 @@ function BlockBody(props: BlockBodyProps) {
             onLinkUpdate={onLinkUpdate}
             onLinkClose={onLinkClose}
             onMarkdownTransform={onMarkdownTransform}
+            multiLine={multiLine}
             registerRef={registerRef}
             className="text-base text-gray-700 italic leading-7"
           />
@@ -1133,6 +1262,7 @@ interface EditableProps {
   html: string;
   placeholder: string;
   className?: string;
+  multiLine?: boolean;
   onChange: (html: string) => void;
   onEnter: () => void;
   onBackspaceEmpty: () => void;
@@ -1150,6 +1280,7 @@ function Editable({
   html,
   placeholder,
   className,
+  multiLine,
   onChange,
   onEnter,
   onBackspaceEmpty,
@@ -1194,23 +1325,36 @@ function Editable({
     const innerHTML = el.innerHTML;
     const plain = el.innerText;
     lastHtmlRef.current = innerHTML;
-    onChange(innerHTML);
 
-    // Markdown shortcut: on space, check prefix.
-    // We check after onChange so state is consistent, but we evaluate based on current text.
-    const sel = window.getSelection();
-    const caretText = plain.slice(0, sel?.focusOffset ?? plain.length);
-    // Actually the simplest: check if plain text fully matches a shortcut + already includes a trailing space (just typed).
+    // Markdown shortcut: fires when the plain text matches a known prefix pattern.
+    // Wipe the local DOM so the typed marker doesn't visually remain after type-conversion.
     const shortcut = detectMarkdownShortcut(plain);
     if (shortcut) {
-      // Convert: parent gets called with kind + rest. Replace innerHTML to empty so block doesn't keep marker.
+      el.innerHTML = '';
+      lastHtmlRef.current = '';
+      // Close any open popups owned by this block.
+      if (slashOpenRef.current) {
+        slashOpenRef.current = false;
+        onSlashClose();
+      }
+      if (linkOpenRef.current) {
+        linkOpenRef.current = false;
+        onLinkClose();
+      }
       onMarkdownTransform(shortcut.kind, shortcut.rest);
       return;
     }
 
-    // Slash menu trigger: if there's a "/" right before the caret, with no whitespace between caret and the slash.
-    const slashMatch = caretText.match(/\/([\w-]*)$/);
-    if (slashMatch && plain.startsWith('/') /* basic guard: don't open mid-paragraph */) {
+    // Always propagate the latest HTML to parent state.
+    onChange(innerHTML);
+
+    const sel = window.getSelection();
+    const caretText = plain.slice(0, sel?.focusOffset ?? plain.length);
+
+    // Slash menu: trigger anywhere a "/" precedes the caret with a clean word after it.
+    // Notion behavior: must come after whitespace or be at the very start.
+    const slashMatch = caretText.match(/(?:^|\s)\/([\w-]*)$/);
+    if (slashMatch) {
       const rect = getCaretRect(el);
       if (!slashOpenRef.current) {
         slashOpenRef.current = true;
@@ -1251,6 +1395,13 @@ function Editable({
     }
 
     if (e.key === 'Enter' && !e.shiftKey) {
+      if (multiLine) {
+        // In multi-line mode (canvas cards), Enter inserts a line break
+        // rather than splitting the block.
+        e.preventDefault();
+        document.execCommand('insertLineBreak');
+        return;
+      }
       e.preventDefault();
       onEnter();
       return;
